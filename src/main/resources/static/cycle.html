@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CycleShop</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<style>
+    #button{
+        width: auto;
+        height: auto;
+    }
+</style>
+</head>
+<body>
+    <script>
+    $(document).ready(function(){
+        $("#list").click(function(){
+           $.ajax({
+            type : "GET",
+            contentType: "application/json",
+            url: "/cycle/list",
+            success: function(data) {
+                var div2 = $("<div>");
+                console.log(div2[0]);
+                for (var i = 0; i < data.length; i++) {
+                var brand = createdivs("brand")
+                brand.textContent = data[i].brand + "-" + data[i].stock;
+                console.log(brand);
+                   div2[0].append(brand);
+                   var button = createbutton("borrow");
+                   div2[0].appendChild(button);
+                }
+                $("#cycle-list").html(div2);
+            },
+            error: function(e){
+                var json = e.responseText;
+                $("#cycle-list").html(json);
+            }
+           });
+        });
+    });
+    $(document).ready(function(){
+        $("#borrow").click(function(){
+           $.ajax({
+            type : "GET",
+            contentType: "application/json",
+            url: "/cycle/1/borrow",
+            success: function(data) {
+                $("#cycle-list").html(JSON.stringify(data));
+            },
+            error: function(e){
+                var json = e.responseText;
+                $("#cycle-list").html(json);
+            }
+           });
+        });
+    });
+    $(document).ready(function(){
+        $("#add").click(function(){
+            $.ajax({
+                type:"POST",
+                contentType:"application/json",
+                url: "/cycle/add",
+                success: function(data){
+                    
+                },
+                error: function(e){
+
+                }
+            });
+        });
+    });
+    function createdivs(name){
+        var div = document.createElement("div");
+        div.className = name;
+        return div;
+    }
+    function createbutton(id,brand){
+        var button = document.createElement("button");
+        button.id = id;
+        button.textContent = "borrow";
+        return button;
+    }
+    </script>
+    <h1>Borrowing</h1>
+    <div id="cycle-list"></div><br>
+    <button id="list">list</button>
+    <button id="add">add</button>
+</body>
+</html>

@@ -80,6 +80,7 @@ public class CycleService {
     public ResponseEntity<String> addCycle(Cycle cycle) {
         try {
             cycle.setNumBorrowed(0);
+
             cycleRepository.save(cycle);
             return ResponseEntity.ok("Cycle added successfully.");
         } catch (Exception e) {

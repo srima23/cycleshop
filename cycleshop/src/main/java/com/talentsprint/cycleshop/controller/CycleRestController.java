@@ -1,14 +1,17 @@
 package com.talentsprint.cycleshop.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,18 +20,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.talentsprint.cycleshop.business.LoginBody;
 import com.talentsprint.cycleshop.dto.CycleJsonInputIdCount;
+import com.talentsprint.cycleshop.entity.Cart;
 import com.talentsprint.cycleshop.entity.Cycle;
 import com.talentsprint.cycleshop.entity.User;
 import com.talentsprint.cycleshop.exception.CycleNotFoundException;
 import com.talentsprint.cycleshop.exception.InsufficientStockException;
+import com.talentsprint.cycleshop.service.CartService;
 import com.talentsprint.cycleshop.service.CycleService;
 import com.talentsprint.cycleshop.service.DomainUserService;
 import com.talentsprint.cycleshop.service.RegistrationForm;
+import com.talentsprint.cycleshop.service.TransactionService;
 import com.talentsprint.cycleshop.service.UserService;
 
 @RestController
-@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE,
-        RequestMethod.OPTIONS, RequestMethod.HEAD }, allowedHeaders = "*")
+@CrossOrigin
 @RequestMapping("/api/cycles")
 public class CycleRestController {
 
@@ -45,6 +50,12 @@ public class CycleRestController {
 
     @Autowired
     private DomainUserService domainUserService;
+
+    @Autowired
+    private CartService cartService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     @PostMapping("/{id}/borrow")
     public ResponseEntity<String> borrowCycle(@RequestBody CycleJsonInputIdCount IdCount) {
@@ -113,18 +124,6 @@ public class CycleRestController {
         return cycleService.addCycle(cycle);
     }
 
-    // @PostMapping("/register")
-    // public ResponseEntity<String> registerUser(@RequestBody User user) {
-    // ResponseEntity<String> registrationResponse = userService.registerUser(user);
-
-    // if (registrationResponse.getStatusCode() == HttpStatus.OK) {
-    // return ResponseEntity.ok("Registration successful");
-    // } else {
-    // return
-    // ResponseEntity.status(HttpStatus.BAD_REQUEST).body(registrationResponse.getBody());
-    // }
-    // }
-
     @PostMapping("/register")
 
     public ResponseEntity<String> registerUser(@RequestBody RegistrationForm registrationForm) {
@@ -163,5 +162,64 @@ public class CycleRestController {
 
         }
 
+    }
+
+    @PostMapping("/{id}/cart")
+
+    public ResponseEntity<String> cartCyclePostMapping(@PathVariable long id,
+            @RequestBody Map<String, Integer> requestData) {
+
+        int count = requestData.getOrDefault("count", 1);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String username = authentication.getName();
+
+        cartService.addToCart(count, id, username);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Cycle added to cart successfully");
+
+    }
+
+    @GetMapping("/cart")
+
+    public ResponseEntity<List<Cart>> listCyclesInCart() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String username = authentication.getName();
+
+        long userId = userService.getByName(username).get().getId();
+
+        System.out.println(userId);
+
+        var allCyclesInCart = cartService.getCyclesByUserId(userId);
+
+        System.out.println(allCyclesInCart);
+
+        return ResponseEntity.status(HttpStatus.OK).body(allCyclesInCart);
+
+    }
+
+    @PostMapping("/checkOut")
+
+    public void rentCycles(@RequestBody Map<String, Integer> requestData) {
+
+        double totalAmount = requestData.getOrDefault("totalAmount", 0);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String username = authentication.getName();
+
+        transactionService.rentCycles(username, totalAmount);
+
+    }
+
+    @PostMapping("/return")
+
+    public ResponseEntity<String> returnRentedCycle(@RequestBody Map<String, Integer> requestData) {
+        long cartId = requestData.getOrDefault("cartId", 1);
+        cartService.returnCycle(cartId);
+        return ResponseEntity.status(HttpStatus.OK).body("Cycle returned successfully");
     }
 }

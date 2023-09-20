@@ -53,6 +53,9 @@ public class BasicConfiguration {
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
+    private CorsConfig corsConfig;
+
+    @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
     }
@@ -66,6 +69,7 @@ public class BasicConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfig))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/register", "/api/auth/token")
                         .permitAll()

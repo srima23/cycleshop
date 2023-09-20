@@ -16,6 +16,7 @@ public class Cycle {
     private String brand;
     private int stock;
     private int numBorrowed;
+    private int price;
 
     public int getNumAvailable() {
         int available = stock - numBorrowed;

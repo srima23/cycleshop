@@ -9,14 +9,14 @@ import lombok.Data;
 @Entity
 @Data
 public class User {
-    
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private long id;
-    private String name;
-    private String password;
-    private String role;
-    
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+	private String name;
+	private String password;
+	private String role;
+
 	public String getName() {
 		// TODO Auto-generated method stub
 		return this.name;

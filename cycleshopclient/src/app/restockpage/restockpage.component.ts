@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { TitleStrategy } from '@angular/router';
 
 @Component({
   selector: 'app-restockpage',
@@ -12,6 +11,7 @@ export class RestockpageComponent {
   cyclecount: string = '';
   cyclestock: number = 0;
   cyclebrand: string = '';
+  cycleprice: number = 0;
 
   newdata: any;
 
@@ -20,12 +20,17 @@ export class RestockpageComponent {
   submitForm() {
     const cycleData = {
       id: this.cycleid,
-      count: this.cyclecount
+      count: this.cyclecount,
     };
+
     const id = this.cycleid;
     const url = `http://localhost:8080/api/cycles/${id}/restock`;
 
-    this._http.post(url, cycleData, { responseType: 'text' }).subscribe({
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+    this._http.post(url, cycleData, { headers, responseType: 'text' }).subscribe({
       next: (response) => {
         console.log('Cycle restocked successfully:', response);
       },
@@ -38,12 +43,19 @@ export class RestockpageComponent {
   submitAddCycleForm() {
     const newcycleData = {
       brand: this.cyclebrand,
-      stock: this.cyclestock
+      stock: this.cyclestock,
+      price: this.cycleprice
     }
 
     const url = `http://localhost:8080/api/cycles/addcycle`;
 
-    this._http.post(url, newcycleData, { responseType: 'text' }).subscribe({
+
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+
+    this._http.post(url, newcycleData, { headers, responseType: 'text' }).subscribe({
       next: (response) => {
         console.log('Cycle restocked successfully:', response);
       },

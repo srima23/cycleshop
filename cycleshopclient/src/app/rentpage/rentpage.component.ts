@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { AuthService } from '../AuthService';
 
 @Component({
   selector: 'app-rentpage',
@@ -10,10 +11,14 @@ export class RentpageComponent {
 
   newdata: any;
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient, private head: AuthService) { }
 
   getallcycle() {
-    return this._http.get('http://localhost:8080/api/cycles/list-data');
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+    return this._http.get('http://localhost:8080/api/cycles/list-data', { headers: headers });
   }
 
   ngOnInit() {
@@ -32,9 +37,14 @@ export class RentpageComponent {
 
     const requestBody = { id, count: quantityToBorrow };
 
-    const url = `http://localhost:8080/api/cycles/${id}/borrow`;
+    const url = `http://localhost:8080/api/cycles/${id}/cart`;
 
-    this._http.post(url, requestBody, { responseType: 'text' }).subscribe(response => {
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+
+    this._http.post(url, requestBody, { headers: headers, responseType: 'text' }).subscribe(response => {
       this.ngOnInit();
       console.log(`Cycle with ID ${id} rented successfully.`);
     });

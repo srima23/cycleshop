@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 
 
@@ -21,7 +21,12 @@ export class HomepageComponent {
 
   //getting list of cycle data from this endpoint
   getallcycle() {
-    return this._http.get('http://localhost:8080/api/cycles/list-data');
+    const headers = new HttpHeaders({
+
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+
+    });
+    return this._http.get('http://localhost:8080/api/cycles/list-data', { headers: headers });
   }
 
   //show data immidiatly on load

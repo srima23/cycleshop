@@ -8,17 +8,15 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class AuthService {
-    private apiUrl = 'http://localhost:8080/api/auth/token'; // Replace with your API endpoint
+    private apiUrl = 'http://localhost:8080/api/auth/token';
 
     constructor(private http: HttpClient) { }
 
-    // Function to obtain a login token from the server
     login(username: string, password: string): Observable<any> {
         const body = { username, password };
         return this.http.post(`${this.apiUrl}`, body);
     }
 
-    // Function to save and retrieve the token
     setToken(token: string): void {
         localStorage.setItem('token', token);
     }
@@ -27,7 +25,6 @@ export class AuthService {
         return localStorage.getItem('token');
     }
 
-    // Function to add the token to HTTP headers
     getHeaders(): HttpHeaders {
         const token = this.getToken();
         return new HttpHeaders({

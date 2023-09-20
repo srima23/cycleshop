@@ -17,7 +17,8 @@
                         <th scope="col">ID</th>
                         <th scope="col">Brand</th>
                         <th scope="col">Stock</th>
-                        <th scope="col">Borrowed</th>
+                        <th scope="col">Price</th>
+                        <!-- <th scope="col">Borrowed</th> -->
                         <th scope="col">Quantity</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -27,15 +28,15 @@
                         <th scope="row">{{ cycle.id }}</th>
                         <td>{{ cycle.brand }}</td>
                         <td>{{ cycle.stock }}</td>
-                        <td>{{ cycle.numBorrowed }}</td>
+                        <td>₹{{ cycle.price }}</td>
                         <td>
                             <div class="input-container">
                                 <input type="number" [(ngModel)]="cycle.quantityToBorrow" min="0" step="1">
                             </div>
                         </td>
                         <div class="btn-return">
-                            <button (click)="borrowCycle(cycle.id,cycle.quantityToBorrow)"
-                                class="button-3">Borrow</button>
+                            <button (click)="borrowCycle(cycle.id,cycle.quantityToBorrow)" class="button-3">Add to
+                                Cart</button>
                         </div>
                     </tr>
                 </tbody>

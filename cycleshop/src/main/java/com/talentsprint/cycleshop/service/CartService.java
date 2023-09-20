@@ -100,4 +100,18 @@ public class CartService {
 
     }
 
+    public void reduceCartItem(long cartItemId) {
+
+        Cart cart = cartRepository.findById(cartItemId);
+
+        cart.setQuantity(cart.getQuantity() - 1);
+
+        if (cart.getQuantity() == 0) {
+
+            removeCartItem(cartItemId);
+
+        }
+
+    }
+
 }

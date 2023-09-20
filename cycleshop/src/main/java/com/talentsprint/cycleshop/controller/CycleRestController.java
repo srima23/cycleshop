@@ -57,45 +57,50 @@ public class CycleRestController {
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping("/{id}/borrow")
-    public ResponseEntity<String> borrowCycle(@RequestBody CycleJsonInputIdCount IdCount) {
-        try {
-            // Validate input
-            if (IdCount.getCount() <= 0) {
-                return ResponseEntity.badRequest().body("Invalid count for borrowing.");
-            }
+    // @PostMapping("/{id}/borrow")
+    // public ResponseEntity<String> borrowCycle(@RequestBody CycleJsonInputIdCount
+    // IdCount) {
+    // try {
+    // // Validate input
+    // if (IdCount.getCount() <= 0) {
+    // return ResponseEntity.badRequest().body("Invalid count for borrowing.");
+    // }
 
-            // Call the service method to borrow the cycle
-            System.out.println(loginBody.getUsername());
-            cycleService.borrowCycle(IdCount.getId(), IdCount.getCount());
+    // // Call the service method to borrow the cycle
+    // System.out.println(loginBody.getUsername());
+    // cycleService.borrowCycle(IdCount.getId(), IdCount.getCount());
 
-            return ResponseEntity.ok("Cycle borrowed successfully.");
-        } catch (CycleNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (InsufficientStockException e) {
-            return ResponseEntity.badRequest().body("Insufficient stock.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
-        }
-    }
+    // return ResponseEntity.ok("Cycle borrowed successfully.");
+    // } catch (CycleNotFoundException e) {
+    // return ResponseEntity.notFound().build();
+    // } catch (InsufficientStockException e) {
+    // return ResponseEntity.badRequest().body("Insufficient stock.");
+    // } catch (Exception e) {
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error
+    // occurred.");
+    // }
+    // }
 
-    @PostMapping("/{id}/return")
-    public ResponseEntity<String> returnCycle(
-            @RequestBody CycleJsonInputIdCount IdCount) {
-        try {
-            int returnedCount = cycleService.returnCycle(IdCount.getId(), IdCount.getCount());
+    // @PostMapping("/{id}/return")
+    // public ResponseEntity<String> returnCycle(
+    // @RequestBody CycleJsonInputIdCount IdCount) {
+    // try {
+    // int returnedCount = cycleService.returnCycle(IdCount.getId(),
+    // IdCount.getCount());
 
-            if (returnedCount < 0) {
-                return ResponseEntity.badRequest().body("Cannot return more cycles than borrowed.");
-            }
+    // if (returnedCount < 0) {
+    // return ResponseEntity.badRequest().body("Cannot return more cycles than
+    // borrowed.");
+    // }
 
-            return ResponseEntity.ok("Cycle returned successfully.");
-        } catch (CycleNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
-        }
-    }
+    // return ResponseEntity.ok("Cycle returned successfully.");
+    // } catch (CycleNotFoundException e) {
+    // return ResponseEntity.notFound().build();
+    // } catch (Exception e) {
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error
+    // occurred.");
+    // }
+    // }
 
     @PostMapping("/{id}/restock")
     public ResponseEntity<String> restockCycle(
@@ -112,10 +117,7 @@ public class CycleRestController {
 
     @GetMapping("/list-data")
     public ResponseEntity<List<Cycle>> listAvailableCycles(Authentication authentication) {
-        // Jwt jwt = (Jwt) authentication.getPrincipal();
-        // System.out.println(jwt.getClaimAsString("scope"));
         System.out.println("Get Request");
-        // return ResponseEntity.ok(cycleService.listAvailableCycles());
         return ResponseEntity.ok(cycleService.listCycles());
     }
 
@@ -165,7 +167,6 @@ public class CycleRestController {
     }
 
     @PostMapping("/{id}/cart")
-
     public ResponseEntity<String> cartCyclePostMapping(@PathVariable long id,
             @RequestBody Map<String, Integer> requestData) {
 
@@ -182,7 +183,6 @@ public class CycleRestController {
     }
 
     @GetMapping("/cart")
-
     public ResponseEntity<List<Cart>> listCyclesInCart() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -221,5 +221,33 @@ public class CycleRestController {
         long cartId = requestData.getOrDefault("cartId", 1);
         cartService.returnCycle(cartId);
         return ResponseEntity.status(HttpStatus.OK).body("Cycle returned successfully");
+    }
+
+    @PostMapping("/cart/remove")
+
+    public ResponseEntity<String> removeFromCart(@RequestBody Map<String, String> requestData) {
+
+        long cartId = Integer.parseInt(requestData.get("cartId"));
+
+        String action = requestData.get("action");
+
+        System.out.println(action);
+
+        if (action.equals("remove")) {
+
+            cartService.removeCartItem(cartId);
+
+        }
+
+        else if (action.equals("reduce")) {
+
+            cartService.reduceCartItem(cartId);
+        }
+
+        else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid action");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("Cycle removed from cart successfully");
+
     }
 }
